@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: PeatroXD
+      runOnChange: true
+      changes:
+        - insert:
+            tableName: person
+            columns:
+              - column:
+                  name: name
+                  value: "Alice Johnson"
+              - column:
+                  name: birthday
+                  valueDate: "CURRENT_DATE"
+              - column:
+                  name: photo_path
+                  value: "/photos/alice.jpg"
+        - insert:
+            tableName: person
+            columns:
+              - column:
+                  name: name
+                  value: "Bob Smith"
+              - column:
+                  name: birthday
+                  valueDate: "CURRENT_DATE + INTERVAL '3 days'"
+              - column:
+                  name: photo_path
+                  value: "/photos/bob.jpg"
+        - insert:
+            tableName: person
+            columns:
+              - column:
+                  name: name
+                  value: "Charlie Brown"
+              - column:
+                  name: birthday
+                  valueDate: "CURRENT_DATE + INTERVAL '7 days'"
+              - column:
+                  name: photo_path
+                  value: "/photos/charlie.jpg"

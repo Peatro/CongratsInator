@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CongratsInator SPA</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        input, button { margin: 4px 0; }
+    </style>
+</head>
+<body>
+<h1>CongratsInator SPA</h1>
+
+<h2>Добавить день рождения</h2>
+<input id="name" placeholder="Имя">
+<input id="birthday" type="date">
+<button onclick="addPerson()">Добавить</button>
+
+<h2>Список дней рождения</h2>
+<table>
+    <thead>
+    <tr><th>Имя</th><th>Дата</th><th>Действия</th></tr>
+    </thead>
+    <tbody id="persons-table"></tbody>
+</table>
+
+<script>
+    const apiUrl = '/api/persons';
+
+    async function fetchPersons() {
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+        const tbody = document.getElementById('persons-table');
+        tbody.innerHTML = '';
+        data.forEach(p => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                    <td>${p.name}</td>
+                    <td>${p.birthday}</td>
+                    <td>
+                        <button onclick="editPerson(${p.id})">Изменить</button>
+                        <button onclick="deletePerson(${p.id})">Удалить</button>
+                    </td>
+                `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    async function addPerson() {
+        const name = document.getElementById('name').value;
+        const birthday = document.getElementById('birthday').value;
+        if(!name || !birthday) return alert('Заполните все поля');
+        await fetch(apiUrl, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({name, birthday})
+        });
+        document.getElementById('name').value = '';
+        document.getElementById('birthday').value = '';
+        fetchPersons();
+    }
+
+    async function deletePerson(id) {
+        await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
+        fetchPersons();
+    }
+
+    async function editPerson(id) {
+        await fetch(`${apiUrl}/${id}`, { method: 'PUT' });
+        fetchPersons();
+    }
+
+    fetchPersons(); // загрузка списка при старте
+</script>
+</body>
+</html>
