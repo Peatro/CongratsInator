@@ -6,7 +6,6 @@ import com.peatroxd.congratsinator.congratsinator.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -29,11 +28,5 @@ public class PersonServiceImpl implements PersonService {
 
     public List<Person> getAll() {
         return repository.findAll();
-    }
-
-    public List<Person> getTodayAndUpcoming(int daysAhead) {
-        LocalDate today = LocalDate.now();
-        LocalDate end = today.plusDays(daysAhead);
-        return repository.findByBirthdayBetween(today, end);
     }
 }

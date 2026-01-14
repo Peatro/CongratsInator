@@ -8,8 +8,6 @@ import java.util.List;
 public interface PersonController {
     ResponseEntity<List<Person>> getAll();
 
-    ResponseEntity<List<Person>> getUpcoming(int daysAhead);
-
     ResponseEntity<Person> addPerson(Person person);
 
     ResponseEntity<Person> editPerson(Long id, Person person);

@@ -13,6 +13,4 @@ public interface PersonService {
     Person editPerson(Person person);
 
     List<Person> getAll();
-
-    List<Person> getTodayAndUpcoming(int daysAhead);
 }

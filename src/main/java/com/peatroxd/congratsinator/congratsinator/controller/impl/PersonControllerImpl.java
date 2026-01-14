@@ -24,13 +24,6 @@ public class PersonControllerImpl implements PersonController {
     }
 
     @Override
-    @GetMapping("/upcoming")
-    public ResponseEntity<List<Person>> getUpcoming(@RequestParam(defaultValue = "7") int daysAhead) {
-        List<Person> upcoming = service.getTodayAndUpcoming(daysAhead);
-        return ResponseEntity.ok(upcoming);
-    }
-
-    @Override
     @PostMapping
     public ResponseEntity<Person> addPerson(@RequestBody Person person) {
         Person saved = service.addPerson(person);
