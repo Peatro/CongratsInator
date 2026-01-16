@@ -8,7 +8,8 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: BIGSERIAL
+                  type: UUID
+                  defaultValueComputed: gen_random_uuid()
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -21,5 +22,5 @@ databaseChangeLog:
                   name: birthday
                   type: DATE
               - column:
-                  name: photo_path
+                  name: photo_key
                   type: VARCHAR(255)
