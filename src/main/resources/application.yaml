@@ -6,3 +6,8 @@ spring:
     show-sql: true
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+minio:
+  url: http://minio:9000
+  access-key: minio
+  secret-key: minio123
+  bucket: persons-photos
