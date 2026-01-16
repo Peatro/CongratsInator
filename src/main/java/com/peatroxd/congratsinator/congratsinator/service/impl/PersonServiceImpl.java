@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +19,7 @@ public class PersonServiceImpl implements PersonService {
         return repository.save(person);
     }
 
-    public void deletePerson(Long id) {
+    public void deletePerson(UUID id) {
         repository.deleteById(id);
     }
 
@@ -28,5 +29,15 @@ public class PersonServiceImpl implements PersonService {
 
     public List<Person> getAll() {
         return repository.findAll();
+    }
+
+    public void updatePhotoPath(UUID id, String fileName) {
+        Person person = repository.findById(id).orElseThrow();
+        person.setPhotoKey(fileName);
+        repository.save(person);
+    }
+
+    public Person getById(UUID id) {
+        return repository.findById(id).orElseThrow();
     }
 }

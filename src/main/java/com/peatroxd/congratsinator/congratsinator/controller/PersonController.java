@@ -1,16 +1,17 @@
 package com.peatroxd.congratsinator.congratsinator.controller;
 
-import com.peatroxd.congratsinator.congratsinator.model.Person;
+import com.peatroxd.congratsinator.congratsinator.dto.PersonDto;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface PersonController {
-    ResponseEntity<List<Person>> getAll();
+    ResponseEntity<List<PersonDto>> getAll();
 
-    ResponseEntity<Person> addPerson(Person person);
+    ResponseEntity<PersonDto> addPerson(PersonDto person);
 
-    ResponseEntity<Person> editPerson(Long id, Person person);
+    ResponseEntity<PersonDto> editPerson(UUID id, PersonDto person);
 
-    ResponseEntity<Void> deletePerson(Long id);
+    ResponseEntity<Void> deletePerson(UUID id);
 }
