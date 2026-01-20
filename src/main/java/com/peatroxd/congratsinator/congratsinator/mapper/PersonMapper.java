@@ -2,19 +2,27 @@ package com.peatroxd.congratsinator.congratsinator.mapper;
 
 import com.peatroxd.congratsinator.congratsinator.dto.PersonDto;
 import com.peatroxd.congratsinator.congratsinator.model.Person;
+import com.peatroxd.congratsinator.congratsinator.util.PhotoUrlResolver;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PersonMapper {
 
+    private final PhotoUrlResolver photoUrlResolver;
+
     public PersonDto toDto(Person person) {
         String photoUrl = null;
 
-        if (person.getPhotoKey() != null) {
-            // Вместо presigned URL возвращаем endpoint Spring
-            photoUrl = "/api/persons/" + person.getId() + "/photo";
+        if(person.getPhotoKey() != null) {
+            try {
+                photoUrl = photoUrlResolver.resolvePhotoUrl(person.getId());
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
         }
 
         return PersonDto.builder()
@@ -25,12 +33,12 @@ public class PersonMapper {
                 .build();
     }
 
-    public Person toEntity(PersonDto personDto) {
+    public Person toEntity(PersonDto dto) {
         return new Person(
-                personDto.getId(),
-                personDto.getName(),
-                personDto.getBirthday(),
-                null // photoKey оставляем null, обновляем только через загрузку фото
+                dto.getId(),
+                dto.getName(),
+                dto.getBirthday(),
+                null
         );
     }
 }

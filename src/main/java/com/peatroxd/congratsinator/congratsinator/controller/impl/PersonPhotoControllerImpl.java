@@ -28,10 +28,9 @@ public class PersonPhotoControllerImpl {
     public ResponseEntity<String> uploadPhoto(@PathVariable UUID id,
                                               @RequestParam("file") MultipartFile file) throws Exception {
 
-        String key = photoService.uploadPhoto(file, id);       // Загружаем в MinIO
-        personService.updatePhotoPath(id, key);               // Сохраняем ключ в БД
+        String key = photoService.uploadPhoto(file, id);
+        personService.updatePhotoPath(id, key);
 
-        // Возвращаем URL через наш Spring Boot, а не напрямую в MinIO
         String url = "/api/persons/" + id + "/photo";
         return ResponseEntity.ok(url);
     }

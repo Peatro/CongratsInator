@@ -3,8 +3,10 @@ package com.peatroxd.congratsinator.congratsinator.service.impl;
 import com.peatroxd.congratsinator.congratsinator.model.Person;
 import com.peatroxd.congratsinator.congratsinator.repository.PersonRepository;
 import com.peatroxd.congratsinator.congratsinator.service.PersonService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +22,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     public void deletePerson(UUID id) {
-        repository.deleteById(id);
+        repository.findById(id).ifPresent(repository::delete);
     }
 
     public Person editPerson(Person person) {
@@ -31,13 +33,19 @@ public class PersonServiceImpl implements PersonService {
         return repository.findAll();
     }
 
+    @Transactional
     public void updatePhotoPath(UUID id, String fileName) {
-        Person person = repository.findById(id).orElseThrow();
+        Person person = findByIdOrThrow(id);
+
         person.setPhotoKey(fileName);
-        repository.save(person);
     }
 
     public Person getById(UUID id) {
-        return repository.findById(id).orElseThrow();
+        return findByIdOrThrow(id);
+    }
+
+    private Person findByIdOrThrow(UUID id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Person not found: " + id));
     }
 }

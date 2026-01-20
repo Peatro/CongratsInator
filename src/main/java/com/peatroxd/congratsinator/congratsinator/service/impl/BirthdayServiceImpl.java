@@ -5,10 +5,11 @@ import com.peatroxd.congratsinator.congratsinator.repository.PersonRepository;
 import com.peatroxd.congratsinator.congratsinator.service.BirthdayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.MonthDay;
 import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -18,29 +19,21 @@ public class BirthdayServiceImpl implements BirthdayService {
     private final PersonRepository repository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<Person> getTodayBirthdays() {
-        LocalDate today = LocalDate.now();
+        MonthDay today = MonthDay.from(LocalDate.now());
 
-        return repository.findAll().stream()
-                .filter(p ->
-                        p.getBirthday().getDayOfMonth() == today.getDayOfMonth()
-                                && p.getBirthday().getMonth() == today.getMonth()
-                )
-                .toList();
+        return repository.findByBirthdayMonthAndBirthdayDay(today.getMonthValue(), today.getDayOfMonth());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Person> getUpcomingBirthdays(int days) {
         LocalDate today = LocalDate.now();
+        List<Person> upcoming = repository.findUpcomingBirthdays(today.getMonthValue(), today.getDayOfMonth());
 
-        return repository.findAll().stream()
-                .filter(p -> {
-                    long diff = daysUntilNextBirthday(p.getBirthday(), today);
-                    return diff >= 0 && diff <= days;
-                })
-                .sorted(Comparator.comparing(
-                        p -> daysUntilNextBirthday(p.getBirthday(), today)
-                ))
+        return upcoming.stream()
+                .filter(p -> daysUntilNextBirthday(p.getBirthday(), today) <= days)
                 .toList();
     }
 

@@ -40,8 +40,7 @@ public class PersonControllerImpl implements PersonController {
     @Override
     @PostMapping
     public ResponseEntity<PersonDto> addPerson(@RequestBody PersonDto dto) {
-        Person person = personMapper.toEntity(dto);
-        Person saved = personService.addPerson(person);
+        Person saved = personService.addPerson(personMapper.toEntity(dto));
 
         return ResponseEntity.ok(personMapper.toDto(saved));
     }
