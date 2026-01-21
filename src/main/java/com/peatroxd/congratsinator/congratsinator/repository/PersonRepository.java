@@ -9,14 +9,31 @@ import java.util.List;
 import java.util.UUID;
 
 public interface PersonRepository extends JpaRepository<Person, UUID> {
-    @Query("SELECT p FROM Person p WHERE FUNCTION('MONTH', p.birthday) = :month AND FUNCTION('DAY', p.birthday) = :day")
-    List<Person> findByBirthdayMonthAndBirthdayDay(@Param("month") int month, @Param("day") int day);
 
-    @Query("""
-                SELECT p FROM Person p
-                WHERE (FUNCTION('MONTH', p.birthday) > :currentMonth)
-                      OR (FUNCTION('MONTH', p.birthday) = :currentMonth AND FUNCTION('DAY', p.birthday) >= :currentDay)
-                ORDER BY FUNCTION('MONTH', p.birthday), FUNCTION('DAY', p.birthday)
-            """)
-    List<Person> findUpcomingBirthdays(@Param("currentMonth") int from, @Param("currentDay") int to);
+    @Query(
+            value = """
+        SELECT * FROM person p
+        WHERE EXTRACT(MONTH FROM p.birthday) = :currentMonth
+          AND EXTRACT(DAY FROM p.birthday) = :currentDay
+    """,
+            nativeQuery = true
+    )
+    List<Person> findByBirthdayMonthAndBirthdayDay(
+            @Param("currentMonth") int currentMonth,
+            @Param("currentDay") int currentDay
+    );
+
+    @Query(
+            value = """
+                        SELECT * FROM Person p
+                        WHERE EXTRACT(MONTH FROM p.birthday) > :currentMonth
+                            OR (EXTRACT(MONTH FROM p.birthday) = :currentMonth
+                                AND EXTRACT(DAY FROM p.birthday) >= :currentDay )
+                        ORDER BY
+                            EXTRACT(MONTH FROM p.birthday),
+                            EXTRACT(DAY FROM p.birthday)
+                    """,
+            nativeQuery = true
+    )
+    List<Person> findUpcomingBirthdays(@Param("currentMonth") int currentMonth, @Param("currentDay") int currentDay);
 }

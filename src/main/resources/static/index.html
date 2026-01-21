@@ -55,7 +55,15 @@
 
     async function fetchPersons() {
         const res = await fetch(apiUrl);
+        if (!res.ok) {
+            console.error('Failed to fetch persons:', res.status);
+            return;
+        }
+
         const data = await res.json();
+
+        data.sort((a, b) => new Date(a.birthday) - new Date(b.birthday));
+
         const tbody = document.getElementById('persons-table');
         tbody.innerHTML = '';
 
@@ -64,21 +72,21 @@
             tr.id = `person-${p.id}`;
 
             tr.innerHTML = `
-                <td>${p.photoUrl ? `<img src="${p.photoUrl}" alt="photo">` : '—'}</td>
-                <td>${p.name}</td>
-                <td>${p.birthday}</td>
-                <td>
-                    <input type="file" onchange="uploadPhoto('${p.id}', this.files[0])"><br>
-                    <button onclick="deletePerson(${p.id})">Удалить</button>
-                </td>
-            `;
+            <td>${p.photoUrl ? `<img src="${p.photoUrl}" alt="photo">` : '—'}</td>
+            <td>${p.name}</td>
+            <td>${p.birthday}</td>
+            <td>
+                <input type="file" onchange="uploadPhoto('${p.id}', this.files[0])"><br>
+                <button onclick="deletePerson('${p.id}')">Удалить</button>
+            </td>
+        `;
 
             tbody.appendChild(tr);
         });
     }
 
     async function addPerson() {
-        const name = document.getElementById('name').value;
+        const name = document.getElementById('name').value.trim();
         const birthday = document.getElementById('birthday').value;
 
         if (!name || !birthday) {
@@ -104,8 +112,6 @@
     }
 
     async function uploadPhoto(personId, file) {
-        console.log('Uploading photo for person ID:', personId, 'File:', file);
-
         if (!file) return;
 
         const formData = new FormData();
@@ -117,24 +123,22 @@
         });
 
         if (!res.ok) {
-            console.error('Photo upload failed with status:', res.status);
             alert('Ошибка при загрузке фото');
             return;
         }
 
         const photoUrl = await res.text();
 
-        // можно сразу обновить картинку в таблице, не дергая весь fetchPersons()
         const tr = document.querySelector(`#person-${personId}`);
         if (tr) {
-            const img = tr.querySelector('img');
-            if (img) img.src = photoUrl;
-            else tr.querySelector('td').innerHTML = `<img src="${photoUrl}" alt="photo">`;
+            const imgTd = tr.querySelector('td');
+            if (imgTd) imgTd.innerHTML = `<img src="${photoUrl}" alt="photo">`;
         }
     }
 
     fetchPersons();
 </script>
+
 
 </body>
 </html>
