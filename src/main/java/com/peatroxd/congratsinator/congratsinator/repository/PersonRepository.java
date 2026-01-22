@@ -25,7 +25,7 @@ public interface PersonRepository extends JpaRepository<Person, UUID> {
 
     @Query(
             value = """
-                        SELECT * FROM Person p
+                        SELECT * FROM person p
                         WHERE EXTRACT(MONTH FROM p.birthday) > :currentMonth
                             OR (EXTRACT(MONTH FROM p.birthday) = :currentMonth
                                 AND EXTRACT(DAY FROM p.birthday) >= :currentDay )

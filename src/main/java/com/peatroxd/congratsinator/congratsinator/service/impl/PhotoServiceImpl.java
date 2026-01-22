@@ -10,6 +10,7 @@ import io.minio.PutObjectArgs;
 import io.minio.http.Method;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PhotoServiceImpl implements PhotoService {
@@ -38,7 +40,7 @@ public class PhotoServiceImpl implements PhotoService {
     public String uploadPhoto(MultipartFile file, UUID personId) throws Exception {
         String key = "persons/" + personId + "/" + file.getOriginalFilename();
 
-        System.out.println("UPLOAD TO MINIO: " + key);
+        log.debug("Uploading file {} to bucket {}", file.getOriginalFilename(), bucket);
 
         minioClient.putObject(
                 PutObjectArgs.builder()
@@ -49,7 +51,7 @@ public class PhotoServiceImpl implements PhotoService {
                         .build()
         );
 
-        System.out.println("UPLOAD DONE");
+        log.debug("Uploaded file {} to bucket {}", file.getOriginalFilename(), bucket);
 
         return key;
     }

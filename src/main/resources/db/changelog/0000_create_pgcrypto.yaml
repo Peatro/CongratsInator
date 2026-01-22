@@ -1,7 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: 0
-      author: peatroxd
-      changes:
-        - sql:
-            sql: CREATE EXTENSION IF NOT EXISTS "pgcrypto";
