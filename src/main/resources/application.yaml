@@ -1,12 +1,49 @@
 spring:
+  application:
+    name: CongratsInator
+
+  thymeleaf:
+    check-template-location: false
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
     show-sql: true
+
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.ssl.enable: true
+      mail.smtp.ssl.trust: smtp.gmail.com
+
+notifications:
+  cron: "0 11 17 * * *"
+  upcoming-days: 7
+  recipients:
+    - peatroxd@yandex.ru
+
 minio:
-  url: http://minio:9000
-  access-key: minio
-  secret-key: minio123
+  url: ${MINIO_URL}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
   bucket: persons-photos
+
+logging:
+  level:
+    org.springframework.mail: DEBUG
+    jakarta.mail: DEBUG
+    com.peatroxd.congratsinator: DEBUG
