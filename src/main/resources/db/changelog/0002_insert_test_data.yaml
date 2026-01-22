@@ -8,6 +8,9 @@ databaseChangeLog:
             tableName: person
             columns:
               - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
                   name: name
                   value: "Alice Johnson"
               - column:
@@ -20,6 +23,9 @@ databaseChangeLog:
             tableName: person
             columns:
               - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
                   name: name
                   value: "Bob Smith"
               - column:
@@ -31,6 +37,9 @@ databaseChangeLog:
         - insert:
             tableName: person
             columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
               - column:
                   name: name
                   value: "Charlie Brown"
