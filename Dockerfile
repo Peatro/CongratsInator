@@ -1,7 +1,9 @@
-FROM eclipse-temurin:21-jre-alpine
+FROM gradle:9.2.1-jdk21 as builder
+WORKDIR /builds
+COPY ./ /builds
+RUN gradle build -x test
 
+FROM eclipse-temurin:21-jre
 WORKDIR /app
-
-COPY build/libs/CongratsInator-0.0.1-SNAPSHOT.jar app.jar
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
+COPY --from=builder /builds/build/libs/*.jar /app/app.jar
+CMD ["java", "-jar", "app.jar"]
