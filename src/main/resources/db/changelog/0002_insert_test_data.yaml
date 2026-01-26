@@ -1,51 +1,11 @@
 databaseChangeLog:
+  - logicalFilePath: db/changelog/0002_insert_test_data.yaml
   - changeSet:
       id: 2
       author: peatroxd
-      runOnChange: true
       changes:
-        - insert:
+        - loadData:
+            file: db/changelog/csv/test_data_for_table_person.csv
             tableName: person
-            columns:
-              - column:
-                  name: id
-                  valueComputed: gen_random_uuid()
-              - column:
-                  name: name
-                  value: "Alice Johnson"
-              - column:
-                  name: birthday
-                  valueDate: "CURRENT_DATE"
-              - column:
-                  name: photo_key
-                  value: "/photos/alice.jpg"
-        - insert:
-            tableName: person
-            columns:
-              - column:
-                  name: id
-                  valueComputed: gen_random_uuid()
-              - column:
-                  name: name
-                  value: "Bob Smith"
-              - column:
-                  name: birthday
-                  valueDate: "CURRENT_DATE + INTERVAL '3 days'"
-              - column:
-                  name: photo_key
-                  value: "/photos/bob.jpg"
-        - insert:
-            tableName: person
-            columns:
-              - column:
-                  name: id
-                  valueComputed: gen_random_uuid()
-              - column:
-                  name: name
-                  value: "Charlie Brown"
-              - column:
-                  name: birthday
-                  valueDate: "CURRENT_DATE + INTERVAL '7 days'"
-              - column:
-                  name: photo_key
-                  value: "/photos/charlie.jpg"
+            separator: ","
+            encoding: UTF-8

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -30,9 +31,10 @@ public class BirthdayServiceImpl implements BirthdayService {
     @Transactional(readOnly = true)
     public List<Person> getUpcomingBirthdays(int days) {
         LocalDate today = LocalDate.now();
-        List<Person> upcoming = repository.findUpcomingBirthdays(today.getMonthValue(), today.getDayOfMonth());
 
-        return upcoming.stream()
+        return repository.findAll().stream()
+                .filter(p -> p.getBirthday() != null)
+                .sorted(Comparator.comparingLong(p -> daysUntilNextBirthday(p.getBirthday(), today)))
                 .filter(p -> daysUntilNextBirthday(p.getBirthday(), today) <= days)
                 .toList();
     }

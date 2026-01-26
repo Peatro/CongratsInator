@@ -22,18 +22,4 @@ public interface PersonRepository extends JpaRepository<Person, UUID> {
             @Param("currentMonth") int currentMonth,
             @Param("currentDay") int currentDay
     );
-
-    @Query(
-            value = """
-                        SELECT * FROM person p
-                        WHERE EXTRACT(MONTH FROM p.birthday) > :currentMonth
-                            OR (EXTRACT(MONTH FROM p.birthday) = :currentMonth
-                                AND EXTRACT(DAY FROM p.birthday) >= :currentDay )
-                        ORDER BY
-                            EXTRACT(MONTH FROM p.birthday),
-                            EXTRACT(DAY FROM p.birthday)
-                    """,
-            nativeQuery = true
-    )
-    List<Person> findUpcomingBirthdays(@Param("currentMonth") int currentMonth, @Param("currentDay") int currentDay);
 }
