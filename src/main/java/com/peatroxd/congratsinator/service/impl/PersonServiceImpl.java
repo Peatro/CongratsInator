@@ -1,5 +1,6 @@
 package com.peatroxd.congratsinator.service.impl;
 
+import com.peatroxd.congratsinator.enums.NotFoundExceptionMessage;
 import com.peatroxd.congratsinator.model.Person;
 import com.peatroxd.congratsinator.repository.PersonRepository;
 import com.peatroxd.congratsinator.service.PersonService;
@@ -46,6 +47,8 @@ public class PersonServiceImpl implements PersonService {
 
     private Person findByIdOrThrow(UUID id) {
         return repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Person not found: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        NotFoundExceptionMessage.PERSON_NOT_FOUND.getMessage() + id)
+                );
     }
 }
