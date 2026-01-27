@@ -1,6 +1,7 @@
 package com.peatroxd.congratsinator.service.impl;
 
 import com.peatroxd.congratsinator.model.Person;
+import com.peatroxd.congratsinator.notification.BirthdayNotificationMessageBuilder;
 import com.peatroxd.congratsinator.service.EmailSenderService;
 import com.peatroxd.congratsinator.notification.NotificationProperties;
 import com.peatroxd.congratsinator.service.BirthdayNotificationService;
@@ -20,6 +21,9 @@ public class BirthdayNotificationServiceImpl implements BirthdayNotificationServ
     private final BirthdayService birthdayService;
     private final EmailSenderService emailSender;
     private final NotificationProperties notificationProperties;
+    private final BirthdayNotificationMessageBuilder messageBuilder;
+
+    private static final String SUBJECT_UPCOMING_BIRTHDAYS = "Ближайшие дни рождения";
 
     @Transactional(readOnly = true)
     public void sendUpcomingBirthdayNotification() {
@@ -31,30 +35,14 @@ public class BirthdayNotificationServiceImpl implements BirthdayNotificationServ
             return;
         }
 
-        String message = buildMessage(upcoming, days);
+        String message = messageBuilder.build(upcoming, days);
 
         emailSender.send(
                 notificationProperties.getRecipients(),
-                "Ближайшие дни рождения",
+                SUBJECT_UPCOMING_BIRTHDAYS,
                 message
         );
 
         log.info("Sent upcoming birthday notification for {} persons", upcoming.size());
-    }
-
-    private String buildMessage(List<Person> persons, int days) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Ближайшие дни рождения (")
-                .append(days)
-                .append(" дней):\n\n");
-
-        persons.forEach(p ->
-                sb.append(p.getName())
-                        .append(" — ")
-                        .append(p.getBirthday())
-                        .append("\n")
-        );
-
-        return sb.toString();
     }
 }

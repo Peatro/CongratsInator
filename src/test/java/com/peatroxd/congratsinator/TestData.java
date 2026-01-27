@@ -79,6 +79,10 @@ public class TestData {
                 .build();
     }
 
+    public static List<String> createListOfEmails() {
+        return List.of("a@ex.com", "b@ex.com");
+    }
+
     public static List<Person> createRandomPersonsList() {
         return List.of(createRandomPerson(), createRandomPerson(), createRandomPerson());
     }
