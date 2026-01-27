@@ -57,5 +57,4 @@ public class BirthdayNotificationServiceImpl implements BirthdayNotificationServ
 
         return sb.toString();
     }
-
 }

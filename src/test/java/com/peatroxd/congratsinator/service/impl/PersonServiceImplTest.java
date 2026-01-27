@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.peatroxd.congratsinator.TestData.RANDOM_UUID;
 import static com.peatroxd.congratsinator.TestData.createPerson;
 import static com.peatroxd.congratsinator.TestData.createPersonUsingId;
 import static com.peatroxd.congratsinator.TestData.createPersonWithoutId;
 import static com.peatroxd.congratsinator.TestData.createPersonWithoutPhotoKey;
-import static com.peatroxd.congratsinator.TestData.createRandomPersons;
+import static com.peatroxd.congratsinator.TestData.createRandomPersonsList;
 import static com.peatroxd.congratsinator.TestData.generatePhotoPathUsingId;
+import static com.peatroxd.congratsinator.TestData.generateRandomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,7 +54,7 @@ public class PersonServiceImplTest {
 
     @Test
     void deletePerson_whenExists_deletesIt() {
-        UUID id = RANDOM_UUID;
+        UUID id = generateRandomUUID();
         Person existing = createPersonUsingId(id);
 
         when(personRepository.findById(id)).thenReturn(Optional.of(existing));
@@ -68,8 +68,8 @@ public class PersonServiceImplTest {
 
     @Test
     void deletePerson_whenNotExists_doesNothing() {
-        UUID id = RANDOM_UUID;
-        when(personRepository.findById(RANDOM_UUID)).thenReturn(Optional.empty());
+        UUID id = generateRandomUUID();
+        when(personRepository.findById(id)).thenReturn(Optional.empty());
 
         personServiceImpl.deletePerson(id);
 
@@ -94,7 +94,7 @@ public class PersonServiceImplTest {
 
     @Test
     void getAll_returnsRepositoryResult() {
-        List<Person> persons = createRandomPersons();
+        List<Person> persons = createRandomPersonsList();
 
         when(personRepository.findAll()).thenReturn(persons);
 
@@ -107,7 +107,7 @@ public class PersonServiceImplTest {
 
     @Test
     void getById_whenExists_returnsEntity() {
-        UUID id = RANDOM_UUID;
+        UUID id = generateRandomUUID();
         Person existing = createPersonUsingId(id);
 
         when(personRepository.findById(id)).thenReturn(Optional.of(existing));
@@ -121,7 +121,7 @@ public class PersonServiceImplTest {
 
     @Test
     void getById_whenNotExists_throwsEntityNotFound() {
-        UUID id = RANDOM_UUID;
+        UUID id = generateRandomUUID();
         when(personRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> personServiceImpl.getById(id))
@@ -134,7 +134,7 @@ public class PersonServiceImplTest {
 
     @Test
     void updatePhotoPath_whenExists_updatesPhotoKey() {
-        UUID id = RANDOM_UUID;
+        UUID id = generateRandomUUID();
         Person existing = createPersonUsingId(id);
         String newPhotoPath = generatePhotoPathUsingId(id);
 
@@ -151,7 +151,7 @@ public class PersonServiceImplTest {
 
     @Test
     void updatePhotoPath_whenNotExists_throwsEntityNotFound() {
-        UUID id = RANDOM_UUID;
+        UUID id = generateRandomUUID();
         when(personRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> personServiceImpl.updatePhotoPath(id, "persons/x.png"))
