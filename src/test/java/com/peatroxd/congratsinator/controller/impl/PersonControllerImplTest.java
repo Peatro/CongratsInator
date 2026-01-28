@@ -76,8 +76,6 @@ class PersonControllerImplTest {
 
     @Test
     void addPerson_mapsDtoToEntity_callsService_returnsSavedDto() throws Exception {
-        PersonDto requestDto = PersonDtos.createRequest(Values.PERSON_NAME, Values.BIRTHDAY);
-
         Person entityToSave = Persons.toSaveWithNameAndBirthday(Values.PERSON_NAME, Values.BIRTHDAY);
         Person savedEntity = Persons.persistedWithIdNameBirthday(UUID.randomUUID(), Values.PERSON_NAME,
                 Values.BIRTHDAY);
