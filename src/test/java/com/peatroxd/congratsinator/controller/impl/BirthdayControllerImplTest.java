@@ -4,6 +4,9 @@ import com.peatroxd.congratsinator.dto.PersonDto;
 import com.peatroxd.congratsinator.mapper.PersonMapper;
 import com.peatroxd.congratsinator.model.Person;
 import com.peatroxd.congratsinator.service.BirthdayService;
+import com.peatroxd.congratsinator.testdata.JsonPersonAsserts;
+import com.peatroxd.congratsinator.testdata.PersonDtos;
+import com.peatroxd.congratsinator.testdata.Persons;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -13,14 +16,16 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static com.peatroxd.congratsinator.TestData.createRandomPerson;
-import static com.peatroxd.congratsinator.TestData.dtoFrom;
 import static com.peatroxd.congratsinator.controller.ApiPathsTestData.BIRTHDAY_CONTROLLER_DAYS_PARAM;
 import static com.peatroxd.congratsinator.controller.ApiPathsTestData.BIRTHDAY_CONTROLLER_GET_TODAY_BIRTHDAYS;
 import static com.peatroxd.congratsinator.controller.ApiPathsTestData.BIRTHDAY_CONTROLLER_GET_UPCOMING_BIRTHDAYS;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = BirthdayControllerImpl.class)
 class BirthdayControllerImplTest {
@@ -36,48 +41,42 @@ class BirthdayControllerImplTest {
 
     @Test
     void today_returnsDtos() throws Exception {
-        Person person1 = createRandomPerson();
-        Person person2 = createRandomPerson();
+        Person p1 = Persons.persistedWithName("Alice");
+        Person p2 = Persons.persistedWithName("Bob");
 
-        PersonDto d1 = dtoFrom(person1);
-        PersonDto d2 = dtoFrom(person2);
+        PersonDto d1 = PersonDtos.from(p1);
+        PersonDto d2 = PersonDtos.from(p2);
 
-        when(birthdayService.getTodayBirthdays()).thenReturn(List.of(person1, person2));
-        when(personMapper.toDto(person1)).thenReturn(d1);
-        when(personMapper.toDto(person2)).thenReturn(d2);
+        when(birthdayService.getTodayBirthdays()).thenReturn(List.of(p1, p2));
+        when(personMapper.toDto(p1)).thenReturn(d1);
+        when(personMapper.toDto(p2)).thenReturn(d2);
 
         mockMvc.perform(get(BIRTHDAY_CONTROLLER_GET_TODAY_BIRTHDAYS).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(person1.getId().toString()))
-                .andExpect(jsonPath("$[0].name").value(person1.getName()))
-                .andExpect(jsonPath("$[0].birthday").value(person1.getBirthday().toString()))
-                .andExpect(jsonPath("$[1].id").value(person2.getId().toString()))
-                .andExpect(jsonPath("$[1].name").value(person2.getName()))
-                .andExpect(jsonPath("$[1].birthday").value(person2.getBirthday().toString()));
+                .andExpect(JsonPersonAsserts.listSize(2))
+                .andExpect(JsonPersonAsserts.dtoAt(0, d1))
+                .andExpect(JsonPersonAsserts.dtoAt(1, d2));
 
         verify(birthdayService).getTodayBirthdays();
-        verify(personMapper).toDto(person1);
-        verify(personMapper).toDto(person2);
+        verify(personMapper).toDto(p1);
+        verify(personMapper).toDto(p2);
         verifyNoMoreInteractions(birthdayService, personMapper);
     }
 
     @Test
     void upcoming_withoutDaysParam_usesDefault7() throws Exception {
-        Person person = createRandomPerson();
-        PersonDto d = dtoFrom(person);
+        Person person = Persons.persistedWithName("John");
+        PersonDto dto = PersonDtos.from(person);
 
         when(birthdayService.getUpcomingBirthdays(7)).thenReturn(List.of(person));
-        when(personMapper.toDto(person)).thenReturn(d);
+        when(personMapper.toDto(person)).thenReturn(dto);
 
         mockMvc.perform(get(BIRTHDAY_CONTROLLER_GET_UPCOMING_BIRTHDAYS).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].id").value(person.getId().toString()))
-                .andExpect(jsonPath("$[0].name").value(person.getName()))
-                .andExpect(jsonPath("$[0].birthday").value(person.getBirthday().toString()));
+                .andExpect(JsonPersonAsserts.listSize(1))
+                .andExpect(JsonPersonAsserts.dtoAt(0, dto));
 
         verify(birthdayService).getUpcomingBirthdays(7);
         verify(personMapper).toDto(person);
@@ -93,7 +92,7 @@ class BirthdayControllerImplTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(JsonPersonAsserts.listSize(0));
 
         verify(birthdayService).getUpcomingBirthdays(3);
         verifyNoInteractions(personMapper);

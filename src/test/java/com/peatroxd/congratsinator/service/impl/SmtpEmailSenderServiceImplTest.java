@@ -1,6 +1,7 @@
 package com.peatroxd.congratsinator.service.impl;
 
 import com.peatroxd.congratsinator.service.EmailSenderService;
+import com.peatroxd.congratsinator.testdata.Emails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,9 +14,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
-import static com.peatroxd.congratsinator.TestData.NOTIFICATION_EMAIL_BODY;
-import static com.peatroxd.congratsinator.TestData.NOTIFICATION_EMAIL_SUBJECT;
-import static com.peatroxd.congratsinator.TestData.createListOfEmails;
+import static com.peatroxd.congratsinator.testdata.Values.TEST_NOTIFICATION_EMAIL_BODY;
+import static com.peatroxd.congratsinator.testdata.Values.TEST_NOTIFICATION_EMAIL_SUBJECT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -39,9 +39,9 @@ class SmtpEmailSenderServiceImplTest {
 
     @Test
     void send_buildsMessageAndDelegatesToJavaMailSender() {
-        List<String> to = createListOfEmails();
-        String subject = NOTIFICATION_EMAIL_SUBJECT;
-        String body = NOTIFICATION_EMAIL_BODY;
+        List<String> to = Emails.recipients();
+        String subject = TEST_NOTIFICATION_EMAIL_SUBJECT;
+        String body = TEST_NOTIFICATION_EMAIL_BODY;
 
         emailSender.send(to, subject, body);
 

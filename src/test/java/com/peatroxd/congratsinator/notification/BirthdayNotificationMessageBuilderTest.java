@@ -1,7 +1,7 @@
 package com.peatroxd.congratsinator.notification;
 
-import com.peatroxd.congratsinator.TestData;
 import com.peatroxd.congratsinator.model.Person;
+import com.peatroxd.congratsinator.testdata.Persons;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -11,27 +11,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class BirthdayNotificationMessageBuilderTest {
 
-    private final BirthdayNotificationMessageBuilder builder = new BirthdayNotificationMessageBuilder();
+
+    private final BirthdayNotificationMessageBuilder builder =
+            new BirthdayNotificationMessageBuilder();
 
     @Test
     void build_includesHeaderWithDays() {
-        Person p = TestData.createPersonUsingDateOfBirth(LocalDate.of(1990, 1, 1));
-        p.setName("John");
+        Person person = Persons.aPerson()
+                .withName("John")
+                .withBirthday(LocalDate.of(1990, 1, 1))
+                .build();
 
-        String message = builder.build(List.of(p), 7);
+        String message = builder.build(List.of(person), 7);
 
-        assertThat(message).contains("Ближайшие дни рождения (7 дней):");
+        assertThat(message)
+                .contains("Ближайшие дни рождения (7 дней):");
     }
 
     @Test
     void build_includesEachPersonNameAndBirthday() {
-        Person p1 = TestData.createPersonUsingDateOfBirth(LocalDate.of(1990, 12, 31));
-        p1.setName("Alice");
+        Person alice = Persons.aPerson()
+                .withName("Alice")
+                .withBirthday(LocalDate.of(1990, 12, 31))
+                .build();
 
-        Person p2 = TestData.createPersonUsingDateOfBirth(LocalDate.of(1992, 1, 2));
-        p2.setName("Bob");
+        Person bob = Persons.aPerson()
+                .withName("Bob")
+                .withBirthday(LocalDate.of(1992, 1, 2))
+                .build();
 
-        String message = builder.build(List.of(p1, p2), 7);
+        String message = builder.build(List.of(alice, bob), 7);
 
         assertThat(message)
                 .contains("Alice — 1990-12-31")
@@ -40,10 +49,12 @@ class BirthdayNotificationMessageBuilderTest {
 
     @Test
     void build_endsWithNewLineAfterEachPerson() {
-        Person p = TestData.createPersonUsingDateOfBirth(LocalDate.of(1990, 1, 1));
-        p.setName("John");
+        Person person = Persons.aPerson()
+                .withName("John")
+                .withBirthday(LocalDate.of(1990, 1, 1))
+                .build();
 
-        String message = builder.build(List.of(p), 1);
+        String message = builder.build(List.of(person), 1);
 
         assertThat(message).endsWith("\n");
     }

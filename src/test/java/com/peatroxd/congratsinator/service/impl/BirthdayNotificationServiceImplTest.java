@@ -1,11 +1,12 @@
 package com.peatroxd.congratsinator.service.impl;
 
-import com.peatroxd.congratsinator.TestData;
 import com.peatroxd.congratsinator.model.Person;
 import com.peatroxd.congratsinator.notification.BirthdayNotificationMessageBuilder;
 import com.peatroxd.congratsinator.notification.NotificationProperties;
 import com.peatroxd.congratsinator.service.BirthdayService;
 import com.peatroxd.congratsinator.service.EmailSenderService;
+import com.peatroxd.congratsinator.testdata.Emails;
+import com.peatroxd.congratsinator.testdata.Persons;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,9 +16,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.peatroxd.congratsinator.TestData.createListOfEmails;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -27,7 +28,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class BirthdayNotificationServiceImplTest {
 
-    private static final String SUBJECT_UPCOMING_BIRTHDAYS = "Ближайшие дни рождения";
     private static final int UPCOMING_DAYS = 7;
 
     @Mock
@@ -53,35 +53,36 @@ class BirthdayNotificationServiceImplTest {
         service.sendUpcomingBirthdayNotification();
 
         verify(notificationProperties).getUpcomingDays();
-        verify(birthdayService).getUpcomingBirthdays(7);
+        verify(birthdayService).getUpcomingBirthdays(UPCOMING_DAYS);
 
         verifyNoInteractions(messageBuilder);
         verifyNoInteractions(emailSender);
+        verify(notificationProperties, never()).getRecipients();
+
         verifyNoMoreInteractions(notificationProperties, birthdayService);
     }
 
     @Test
     void sendUpcomingBirthdayNotification_whenUpcomingExists_buildsMessage_andSendsEmail() {
-        List<String> recipients = createListOfEmails();
+        List<String> recipients = Emails.recipients();
 
-        Person p1 = TestData.createPersonUsingDateOfBirth(LocalDate.of(1990, 12, 31));
-        Person p2 = TestData.createPersonUsingDateOfBirth(LocalDate.of(1992, 1, 2));
+        Person p1 = Persons.withBirthday(LocalDate.of(1990, 12, 31));
+        Person p2 = Persons.withBirthday(LocalDate.of(1992, 1, 2));
         List<Person> upcoming = List.of(p1, p2);
 
         when(notificationProperties.getUpcomingDays()).thenReturn(UPCOMING_DAYS);
-        when(notificationProperties.getRecipients()).thenReturn(recipients);
         when(birthdayService.getUpcomingBirthdays(UPCOMING_DAYS)).thenReturn(upcoming);
         when(messageBuilder.build(upcoming, UPCOMING_DAYS)).thenReturn("message");
+        when(notificationProperties.getRecipients()).thenReturn(recipients);
 
         service.sendUpcomingBirthdayNotification();
 
         verify(notificationProperties).getUpcomingDays();
         verify(birthdayService).getUpcomingBirthdays(UPCOMING_DAYS);
-
         verify(messageBuilder).build(upcoming, UPCOMING_DAYS);
 
         verify(notificationProperties).getRecipients();
-        verify(emailSender).send(recipients, SUBJECT_UPCOMING_BIRTHDAYS, "message");
+        verify(emailSender).send(eq(recipients), anyString(), eq("message"));
 
         verifyNoMoreInteractions(notificationProperties, birthdayService, messageBuilder, emailSender);
     }

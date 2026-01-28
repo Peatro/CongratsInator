@@ -17,7 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static com.peatroxd.congratsinator.TestData.STATIC_UUID;
+import java.util.UUID;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,7 +42,7 @@ class PhotoServiceImplTest {
     private static final String INTERNAL_MINIO_HOST = "minio:9000";
     private static final String PUBLIC_MINIO_HOST = "localhost:9000";
     private static final String SIGNATURE_QS = "?X-Amz-Signature=123";
-    public static final String HTTP_LINK = "http://";
+    private static final String HTTP_LINK = "http://";
 
     @Mock
     private MinioClient minioClient;
@@ -79,18 +80,21 @@ class PhotoServiceImplTest {
     @Test
     void uploadPhoto_buildsKey_andCallsPutObject() throws Exception {
         MockMultipartFile file = multipartPng();
+        UUID personId = UUID.randomUUID();
+
+        String expectedKey = expectedKeyFor(personId);
 
         ArgumentCaptor<PutObjectArgs> captor = ArgumentCaptor.forClass(PutObjectArgs.class);
 
-        String key = photoService.uploadPhoto(file, STATIC_UUID);
+        String actualKey = photoService.uploadPhoto(file, personId);
 
-        assertThat(key).isEqualTo(keyFor());
+        assertThat(actualKey).isEqualTo(expectedKey);
 
         verify(minioClient).putObject(captor.capture());
         PutObjectArgs args = captor.getValue();
 
         assertThat(args.bucket()).isEqualTo(BUCKET_NAME);
-        assertThat(args.object()).isEqualTo(key);
+        assertThat(args.object()).isEqualTo(expectedKey);
         assertThat(args.contentType()).isEqualTo(CONTENT_TYPE_PNG);
 
         verifyNoMoreInteractions(minioClient);
@@ -121,8 +125,10 @@ class PhotoServiceImplTest {
     }
 
     @Test
-    void getPhotoUrl_replacesMinioHostForBrowserAccess() throws Exception {
-        String key = keyFor();
+    void getPhotoUrl_replacesMinioHostForBrowserAccess_andKeepsBucketAndKey() throws Exception {
+        UUID personId = UUID.randomUUID();
+        String key = expectedKeyFor(personId);
+
         String presigned = presignedUrl(key);
 
         when(minioClient.getPresignedObjectUrl(any(GetPresignedObjectUrlArgs.class)))
@@ -132,6 +138,7 @@ class PhotoServiceImplTest {
 
         assertThat(result).contains(PUBLIC_MINIO_HOST);
         assertThat(result).doesNotContain(INTERNAL_MINIO_HOST);
+        assertThat(result).contains("/" + BUCKET_NAME + "/" + key);
 
         ArgumentCaptor<GetPresignedObjectUrlArgs> captor = ArgumentCaptor.forClass(GetPresignedObjectUrlArgs.class);
         verify(minioClient).getPresignedObjectUrl(captor.capture());
@@ -153,8 +160,8 @@ class PhotoServiceImplTest {
         );
     }
 
-    private static String keyFor() {
-        return PERSONS_PREFIX + STATIC_UUID + "/" + FILE_NAME;
+    private static String expectedKeyFor(UUID personId) {
+        return PERSONS_PREFIX + personId + "/" + FILE_NAME;
     }
 
     private static String presignedUrl(String key) {
