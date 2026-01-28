@@ -5,6 +5,7 @@ import com.peatroxd.congratsinator.dto.PersonDto;
 import com.peatroxd.congratsinator.mapper.PersonMapper;
 import com.peatroxd.congratsinator.model.Person;
 import com.peatroxd.congratsinator.service.PersonService;
+import com.peatroxd.congratsinator.testdata.JsonBodies;
 import com.peatroxd.congratsinator.testdata.JsonPersonAsserts;
 import com.peatroxd.congratsinator.testdata.PersonDtos;
 import com.peatroxd.congratsinator.testdata.Persons;
@@ -46,7 +47,7 @@ class PersonControllerImplTest {
     @MockitoBean
     PersonMapper personMapper;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @Test
     void getAll_returnsListOfDtos() throws Exception {
@@ -88,7 +89,7 @@ class PersonControllerImplTest {
 
         mockMvc.perform(post(PERSON_CONTROLLER_BASE)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto))
+                        .content(JsonBodies.createPersonRequest(Values.PERSON_NAME, Values.BIRTHDAY))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
